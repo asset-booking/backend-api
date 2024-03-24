@@ -28,6 +28,9 @@ builder.Services.AddCors(opt =>
     });
 });
 
+builder.Configuration
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
