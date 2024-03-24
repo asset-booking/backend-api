@@ -5,8 +5,7 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionStrings:AssetBookingDb": "Host=localhost; Port=5432; Database=asset.booking; Username=postgres; Password=postgres; SearchPath=public,booking,management"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:8001;http://localhost:8000"
