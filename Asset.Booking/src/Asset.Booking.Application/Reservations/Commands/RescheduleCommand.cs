@@ -5,4 +5,5 @@ using SharedKernel;
 
 public record RescheduleCommand(
     Guid ReservationId,
+    DateRange OldInterval,
     DateRange NewInterval) : ICommand;

@@ -7,14 +7,22 @@ using Validation;
 
 public class Client : Entity<Guid>, IAggregateRoot
 {
+    private Client(
+        Guid id,
+        string companyName)
+    {
+        Id = Guard.Against.Default(id);
+        CompanyName = Guard.Against.MissingCompanyName(companyName);
+
+        Contacts = default!;
+    }
+    
     public Client(
         Guid id,
         string companyName,
         Contacts contacts,
-        Address? address = null)
+        Address? address = null) : this(id, companyName)
     {
-        Id = Guard.Against.Default(id);
-        CompanyName = Guard.Against.MissingCompanyName(companyName);
         Contacts = contacts;
         Address = address;
     }

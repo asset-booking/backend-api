@@ -30,7 +30,7 @@ public class Cost : ValueObject
         {
             throw new AssetBookingException(BookingErrors.Reservations.InvalidCostParameters);
         }
-
+        
         var subtotalWithoutVat = PricePerPerson * NumberOfNights * NumberOfPeople;
         VatCost = (subtotalWithoutVat + ServiceFee) * (decimal)VatPercentage / 100;
         TotalCost = subtotalWithoutVat + ServiceFee + VatCost;

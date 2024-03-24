@@ -3,6 +3,7 @@
 public record CostsViewModel(
     decimal PricePerPerson,
     decimal ServiceFee,
+    int NumberOfNights,
     float VatPercentage,
     decimal VatCost,
-    decimal Total);
+    decimal TotalCost);

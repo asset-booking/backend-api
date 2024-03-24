@@ -42,7 +42,6 @@ public class RegisterClientCommandHandler : ICommandHandler<RegisterClientComman
                 contacts,
                 address.IsEmpty ? null : address);
 
-
             await _clientRepository.AddAsync(client, cancellationToken);
             await _clientRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
         }

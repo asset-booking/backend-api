@@ -3,13 +3,12 @@ using System;
 using Ardalis.GuardClauses;
 using SharedKernel;
 using SharedKernel.Exceptions;
-using static Asset.Booking.Domain.AssetSchedule.Validation.BookingErrors;
 
 public static class ReservationGuards
 {
     public static DateRange ChangeAfterReservationStarted(this IGuardClause guardClause, DateRange reservationInterval)
     {
-        if (reservationInterval.StartDate >= DateTime.Now)
+        if (reservationInterval.StartDate < DateTime.Now)
         {
             throw new AssetBookingException(BookingErrors.Reservations.ReservationUpdateAfterStart);
         }
@@ -30,9 +29,11 @@ public static class ReservationGuards
     public static void ReservationOverlapping(
         this IGuardClause guardClause,
         IEnumerable<Reservation> reservations,
-        DateRange reservationInterval)
+        DateRange reservationInterval,
+        Guid? existingReservationId = null)
     {
-        if (reservations.Any(r => r.Interval.Overlaps(reservationInterval)))
+        if (reservations.Any(r => !r.Id.Equals(existingReservationId)
+                                  && r.Interval.Overlaps(reservationInterval)))
         {
             throw new AssetBookingException(BookingErrors.Reservations.IntervalOverlaps);
         }

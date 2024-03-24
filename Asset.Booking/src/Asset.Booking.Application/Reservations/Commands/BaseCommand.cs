@@ -1,19 +1,21 @@
 ﻿namespace Asset.Booking.Application.Reservations.Commands;
 
 using Asset.Booking.Domain.AssetSchedule.Abstractions;
-using Asset.Booking.SharedKernel.Exceptions;
+using SharedKernel.Exceptions;
 using Domain.AssetSchedule;
 using SharedKernel;
 
 public abstract class BaseCommand(IAssetScheduleRepository assetScheduleRepository)
 {
-    public async Task<Result> ExecuteCommandAndSaveAsync(
+    protected readonly IAssetScheduleRepository AssetScheduleRepository = assetScheduleRepository;
+    protected async Task<Result> ExecuteCommandAndSaveAsync(
         Action action,
         CancellationToken cancellationToken)
     {
         try
         {
             action.Invoke();
+            await AssetScheduleRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
         }
         catch (AssetBookingException ex) when (ex.Error is not null)
         {
@@ -24,14 +26,13 @@ public abstract class BaseCommand(IAssetScheduleRepository assetScheduleReposito
             return new Error("Reservations.Error", ex.Message);
         }
 
-        await assetScheduleRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 
-    public static Error ScheduleNotFoundError<T>(string identifierName, T identifier) =>
+    protected static Error ScheduleNotFoundError<T>(string identifierName, T identifier) =>
         EntityNotFoundError(nameof(AssetSchedule), identifierName, identifier);
 
-    public static Error ReservationNotFoundError<T>(string identifierName, T identifier) =>
+    protected static Error ReservationNotFoundError<T>(string identifierName, T identifier) =>
         EntityNotFoundError(nameof(Reservation), identifierName, identifier);
 
     private static Error EntityNotFoundError<T>(string entityName, string identifierName, T identifier)

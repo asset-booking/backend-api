@@ -4,6 +4,8 @@ using Exceptions;
 
 public class DateRange : ValueObject
 {
+    private DateRange() { }
+    
     public DateRange(Date start, Date end)
     {
         StartDate = start.ToDateTime();
@@ -57,6 +59,10 @@ public class DateRange : ValueObject
     public DateRange NewEnd(DateTime newEnd) => new(StartDate, newEnd);
 
     public bool Overlaps(DateRange other) => StartDate < other.EndDate && EndDate > other.StartDate;
+
+    public bool Overlaps(DateRange other, bool excludeEdges) => excludeEdges
+        ? StartDate <= other.EndDate && EndDate >= other.StartDate
+        : Overlaps(other);
 
     public int IntervalNights => (EndDate - StartDate).Days;
 

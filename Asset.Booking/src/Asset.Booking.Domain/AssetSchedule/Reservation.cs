@@ -7,31 +7,49 @@ using Validation;
 
 public class Reservation : Entity<Guid>
 {
-    public Reservation(
+    private Reservation(
         Guid id,
+        int scheduleId,
         int moderatorId,
         Guid clientId,
-        int assetId,
-        Status status,
-        DateRange interval,
-        Cost cost)
+        Status status)
     {
         Id = Guard.Against.Default(id, nameof(id));
-        AssetId = Guard.Against.Default(assetId, nameof(assetId));
+        ScheduleId = Guard.Against.Default(scheduleId, nameof(scheduleId));
         ModeratorId = Guard.Against.Default(moderatorId, nameof(moderatorId));
         ClientId = Guard.Against.Default(clientId, nameof(clientId));
-        Interval = Guard.Against.InvalidInterval(interval);
         Status = status;
+
+        Interval = default!;
+        Cost = default!;
+    }
+    
+    public Reservation(
+        Guid id,
+        int scheduleId,
+        int moderatorId,
+        Guid clientId,
+        Status status,
+        DateRange interval,
+        Cost cost): this(id, scheduleId, moderatorId, clientId, status)
+    {
+        Interval = Guard.Against.InvalidInterval(interval);
         Cost = cost;
     }
 
-    public int AssetId { get; }
+    public int ScheduleId { get; }
     public int ModeratorId { get; }
     public Guid ClientId { get; }
     public Status Status { get; private set; }
     public DateRange Interval { get; private set; }
     public Cost Cost { get; private set; }
 
+    public void Cancel()
+    {
+        Guard.Against.ChangeAfterReservationStarted(Interval);
+        Status = Status.Cancelled;
+    }
+    
     public void ChangePricePerPerson(decimal pricePerPerson)
     {
         Guard.Against.ChangeAfterReservationStarted(Interval);

@@ -10,9 +10,10 @@ public class RescheduleCommandHandler(IAssetScheduleRepository assetScheduleRepo
 {
     public async Task<Result> Handle(RescheduleCommand request, CancellationToken cancellationToken)
     {
-        var assetSchedule = await assetScheduleRepository.GetByReservationIdAsync(
+        var assetSchedule = await AssetScheduleRepository.GetByReservationIdAsync(
             request.ReservationId,
-            request.NewInterval);
+            GetReadInterval(request.OldInterval, request.NewInterval),
+            cancellationToken);
 
         if (assetSchedule is null)
             return ScheduleNotFoundError(nameof(request.ReservationId), request.ReservationId);
@@ -21,4 +22,9 @@ public class RescheduleCommandHandler(IAssetScheduleRepository assetScheduleRepo
             () => assetSchedule.RescheduleReservation(request.ReservationId, request.NewInterval),
             cancellationToken);
     }
+
+    private DateRange GetReadInterval(DateRange currenInterval, DateRange newInterval) =>
+        new DateRange(
+            new DateTime(Math.Min(currenInterval.StartDate.Ticks, newInterval.StartDate.Ticks)),
+            new DateTime(Math.Max(currenInterval.EndDate.Ticks, newInterval.EndDate.Ticks)));
 }

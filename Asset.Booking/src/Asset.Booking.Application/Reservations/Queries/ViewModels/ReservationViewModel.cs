@@ -2,10 +2,12 @@
 using System;
 
 public record ReservationViewModel(
-    Guid ReservationId,
+    Guid Id,
     int AssetId,
+    int ScheduleId,
     DateTime StartDate,
     DateTime EndDate,
     int StatusId,
-    ReservationClientViewModel ReservationClient,
+    string ModeratorName,
+    ReservationClientViewModel Client,
     CostsViewModel Cost);

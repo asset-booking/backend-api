@@ -4,13 +4,18 @@ using Ardalis.GuardClauses;
 using SharedKernel;
 using Validation;
 
-public class Contacts(
-        string email,
-        IEnumerable<PhoneNumber>? phoneNumbers = null) : ValueObject
+public class Contacts : ValueObject
 {
-    public string Email { get; } = Guard.Against.InvalidEmailAddress(email);
-    public IReadOnlyCollection<PhoneNumber> PhoneNumbers { get; } = phoneNumbers?.ToList().AsReadOnly()
-                                                                    ?? new List<PhoneNumber>().AsReadOnly();
+    private Contacts(string email) =>
+        Email = Guard.Against.InvalidEmailAddress(email);
+
+    public Contacts(string email,
+        IEnumerable<PhoneNumber>? phoneNumbers) : this(email) => 
+        PhoneNumbers = phoneNumbers?.ToList().AsReadOnly()
+            ?? new List<PhoneNumber>().AsReadOnly();
+    
+    public string Email { get; }
+    public IReadOnlyCollection<PhoneNumber> PhoneNumbers { get; } = [];
 
     protected override IEnumerable<object> GetEqualityComponents()
     {

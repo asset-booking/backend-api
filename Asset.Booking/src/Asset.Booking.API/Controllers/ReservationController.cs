@@ -3,32 +3,66 @@
 using Application.Reservations.Commands;
 using Application.Reservations.Commands.Dto;
 using Application.Reservations.Queries;
+using Application.Reservations.Queries.Dto;
 using Application.Reservations.Queries.ViewModels;
+using Dto;
 using Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ReservationController : ControllerBase
+public class ReservationController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public ReservationController(IMediator mediator) =>
-        _mediator = mediator;
-
     [HttpGet("GetById")]
     public async Task<ActionResult<ReservationViewModel>> GetAsync(Guid id)
     {
-        var result = await _mediator.Send(new GetReservationByIdQuery(id));
+        Result<ReservationViewModel> result = await mediator.Send(new GetReservationByIdQuery(id));
+        return result.ToActionResult();
+    }
+
+    [HttpGet("GetReservationCost")]
+    public async Task<ActionResult<CostsViewModel>> GetCostAsync([FromQuery] CostDto cost)
+    {
+        Result<CostsViewModel> result = await mediator.Send(new GetReservationCostQuery(cost));
         return result.ToActionResult();
     }
 
     [HttpPost("CreateReservation")]
-    public async Task<ActionResult> PostAsync([FromBody] BookAssetDto reservation)
+    public async Task<ActionResult> CreateAsync([FromBody] BookAssetDto reservation)
     {
-        var newReservationId = Guid.NewGuid();
-        var result = await _mediator.Send(new BookAssetCommand(newReservationId, reservation));
+        Result result = await mediator.Send(new BookAssetCommand(reservation));
+        return result.ToActionResult();
+    }
+    
+    [HttpPut("cancelReservation/{reservationId}")]
+    public async Task<ActionResult> CancelAsync([FromRoute] Guid reservationId)
+    {
+        Result result = await mediator.Send(new CancelReservationCommand(reservationId));
+        return result.ToActionResult();
+    }
+
+    [HttpPut("RescheduleReservation")]
+    public async Task<ActionResult> RescheduleAsync([FromBody] UpdateReservationIntervalDto dto)
+    {
+        DateRange oldDateRange = new DateRange(dto.OldStart, dto.OldEnd);
+        DateRange newDateRange = new DateRange(dto.NewStart, dto.NewEnd);
+        Result result = await mediator.Send(new RescheduleCommand(dto.ReservationId, oldDateRange, newDateRange));
+        return result.ToActionResult();
+    }
+
+    [HttpPut("ChangePrice")]
+    public async Task<ActionResult> ChangePriceAsync([FromBody] ChangePriceDto dto)
+    {
+        Result result = await mediator.Send(new ChangePriceCommand(dto.ReservationId, dto.NewPrice));
+        return result.ToActionResult();
+    }
+
+    [HttpPut("ChangeStatus")]
+    public async Task<ActionResult> ChangeStatusAsync([FromBody] ChangeStatusDto dto)
+    {
+        Result result = await mediator.Send(new ChangeStatusCommand(dto.ReservationId, dto.NewStatusId));
         return result.ToActionResult();
     }
 }

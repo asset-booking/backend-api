@@ -3,7 +3,7 @@
 public record AssetViewModel(
     int Id,
     string CategoryReference,
-    string? Specification = null,
+    string Specification,
     IEnumerable<string>? SpecificationIcons = null,
-    string? Notes = null,
-    IEnumerable<string>? NotesIcons = null);
+    string? Note = null,
+    IEnumerable<string>? NoteIcons = null);

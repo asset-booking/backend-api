@@ -1,7 +1,7 @@
 ﻿namespace Asset.Booking.Application.Reservations.Commands.Dto;
 
 public record BookAssetDto(
-    int ScheduleId,
+    IEnumerable<ScheduleReservationIdsDto> ScheduleReservationIds,
     int StatusId,
     Guid ClientId,
     DateTime StartDate,
@@ -10,3 +10,7 @@ public record BookAssetDto(
     int NumberOfPeople,
     decimal ServiceFee,
     float VatPercentage);
+
+public record ScheduleReservationIdsDto(
+    int ScheduleId,
+    Guid ReservationId);

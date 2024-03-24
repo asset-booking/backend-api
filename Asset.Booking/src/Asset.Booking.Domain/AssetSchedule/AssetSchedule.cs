@@ -6,7 +6,7 @@ using SharedKernel.Abstractions;
 using SharedKernel.Exceptions;
 using Validation;
 
-public class AssetSchedule(int assetId) : Entity<int>, IAggregateRoot
+public class AssetSchedule : Entity<int>, IAggregateRoot
 {
     private readonly List<Reservation> _reservations = new();
 
@@ -22,9 +22,9 @@ public class AssetSchedule(int assetId) : Entity<int>, IAggregateRoot
 
         var reservation = new Reservation(
             reservationId,
+            Id,
             moderatorId,
             clientId,
-            AssetId,
             status,
             interval,
             cost);
@@ -34,13 +34,13 @@ public class AssetSchedule(int assetId) : Entity<int>, IAggregateRoot
 
     public IReadOnlyCollection<Reservation> Reservations => _reservations.AsReadOnly();
 
-    public int AssetId { get; } = Guard.Against.Default(assetId);
+    public int AssetId { get; private set; }
 
     public void RescheduleReservation(Guid reservationId, DateRange newInterval)
     {
         Guard.Against.Default(reservationId, nameof(reservationId));
         Guard.Against.InvalidInterval(newInterval);
-        Guard.Against.ReservationOverlapping(_reservations, newInterval);
+        Guard.Against.ReservationOverlapping(_reservations, newInterval, reservationId);
 
         var reservation = GetReservation(reservationId);
         if (reservation is null)

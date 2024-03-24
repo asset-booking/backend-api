@@ -9,7 +9,7 @@ public class ChangePriceCommandHandler(IAssetScheduleRepository assetScheduleRep
 {
     public async Task<Result> Handle(ChangePriceCommand request, CancellationToken cancellationToken)
     {
-        var reservation = await assetScheduleRepository
+        var reservation = await AssetScheduleRepository
             .GetReservationByIdAsync(request.ReservationId, cancellationToken);
 
         if (reservation is null)
